@@ -27,14 +27,9 @@
 
 .show-option {
   /* border: 1px solid black; */
+  float: right;
   outline: none;
   border: none;
   background-color: transparent;
   margin-left: 6px;
-}
-
-.title {
-  font-size: 50px;
-  margin-right: auto;
-  margin-left: auto;
 }

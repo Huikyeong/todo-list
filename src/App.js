@@ -43,12 +43,54 @@ function TodoForm({addTodo}) {
 }
 
 function TodoState({ remainTodo, option, showOption }) {
+  const printNum = num => {
+    if (num > 1) {
+      return String(num) + " items left";
+    }else if (num === 1) {
+      return String(num) + " item left";
+    }else {
+      return "no item";
+    }
+  }
+
+  const handleHoverIn = e => {
+    e.preventDefault();
+    e.target.style.border = "1px black";
+    e.target.style.outline = "solid";
+  };
+
+  const handleHoverOut = (e, t) => {
+    e.preventDefault();
+    if (t !== option) {
+      e.target.style.border = "none";
+      e.target.style.outline = "none";
+    }
+  };
+
   return(
-    <div style={{fontsize: "10px"}}>
-      { remainTodo() } items left 
-      <button className='show-option' style={{ outline: option === 0 ? "solid" : "none", border: option === 0 ? "1px black" : "none" }} onClick={() => showOption(0)}>All</button>
-      <button className='show-option' style={{ outline: option === 1 ? "solid" : "none", border: option === 1 ? "1px black" : "none" }} onClick={() => showOption(1)}>Active</button>
-      <button className='show-option' style={{ outline: option === 2 ? "solid" : "none", border: option === 2 ? "1px black" : "none" }} onClick={() => showOption(2)}>Completed</button>
+    <div>
+      { printNum(remainTodo()) }
+      <button 
+        className='show-option' 
+        style={{ outline: option === 0 ? "solid" : "none", border: option === 0 ? "1px black" : "none" }} 
+        onMouseOver={handleHoverIn} 
+        onMouseOut={e => handleHoverOut(e, 0)}
+        onClick={() => showOption(0)}
+      >All</button>
+      <button 
+        className='show-option' 
+        style={{ outline: option === 1 ? "solid" : "none", border: option === 1 ? "1px black" : "none" }} 
+        onMouseOver={handleHoverIn} 
+        onMouseOut={e => handleHoverOut(e, 1)}
+        onClick={() => showOption(1)}
+      >Active</button>
+      <button 
+        className='show-option' 
+        style={{ outline: option === 2 ? "solid" : "none", border: option === 2 ? "1px black" : "none" }} 
+        onMouseOver={handleHoverIn} 
+        onMouseOut={e => handleHoverOut(e, 2)}
+        onClick={() => showOption(2)}
+      >Completed</button>
     </div>
   );
 }
@@ -96,6 +138,7 @@ function App() {
 
   return (
     <div className='app'>
+      {/* <div className='title'>Toddo</div> */}
       <div className='todo-list'>
         <TodoForm addTodo={addTodo} />
         {todos.map((todo, index) => (

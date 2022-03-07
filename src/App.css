@@ -33,3 +33,18 @@
   background-color: transparent;
   margin-left: 6px;
 }
+
+.input {
+  border: 1px solid black;
+  box-sizing: border-box;
+  width: 400px;
+  align-items: center;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+}

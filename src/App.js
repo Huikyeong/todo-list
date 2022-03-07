@@ -31,6 +31,7 @@ function Todo({ todo, index, completeTodo, removeTodo, option, editTodo }) {
     <div>
       {isEditable ? (
         <input
+          className='input'
           type="text"
           value={text}
           onChange={handleChange}
@@ -62,10 +63,11 @@ function TodoForm({ addTodo }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "6px" }}>
+    <form onSubmit={handleSubmit} style={{ marginBottom: "12px" }}>
       <input
         type='text'
         className='input'
+        placeholder='type here...'
         value={value}
         onChange={e => setValue(e.target.value)}
       />

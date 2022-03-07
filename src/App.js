@@ -2,7 +2,13 @@ import React, { useState } from 'react'
 import logo from './logo.svg';
 import './App.css';
 
-function Todo({ todo, index, completeTodo, removeTodo }) {
+function Todo({ todo, index, completeTodo, removeTodo, option }) {
+  if (option === 1 && todo.isCompleted) {
+    return(<div></div>);
+  }else if (option === 2 && !todo.isCompleted) {
+    return(<div></div>);
+  }
+
   return (
     <div className='todo' style={{ textDecoration: todo.isCompleted ? "line-through" : "" }}>
       {todo.text}
@@ -36,10 +42,13 @@ function TodoForm({addTodo}) {
   );
 }
 
-function TodoState({ remainTodo }) {
+function TodoState({ remainTodo, option, showOption }) {
   return(
-    <div style={{fontsize: "12px"}}>
-      { String(remainTodo()) + " items left"}
+    <div style={{fontsize: "10px"}}>
+      { remainTodo() } items left 
+      <button className='show-option' style={{ outline: option === 0 ? "solid" : "none", border: option === 0 ? "1px black" : "none" }} onClick={() => showOption(0)}>All</button>
+      <button className='show-option' style={{ outline: option === 1 ? "solid" : "none", border: option === 1 ? "1px black" : "none" }} onClick={() => showOption(1)}>Active</button>
+      <button className='show-option' style={{ outline: option === 2 ? "solid" : "none", border: option === 2 ? "1px black" : "none" }} onClick={() => showOption(2)}>Completed</button>
     </div>
   );
 }
@@ -50,6 +59,8 @@ function App() {
     { text: "second todo", isCompleted: false },
     { text: "third todo", isCompleted: false }
   ]);
+
+  const [option, setOption] = React.useState(1);
 
   const addTodo = text => {
     const newTodos = [...todos, { text, isCompleted: false }];
@@ -78,6 +89,11 @@ function App() {
     return count;
   };
 
+  const showOption = newOption => {
+
+    setOption(newOption);
+  }
+
   return (
     <div className='app'>
       <div className='todo-list'>
@@ -89,9 +105,14 @@ function App() {
             todo={todo}
             completeTodo={completeTodo}
             removeTodo={removeTodo}
+            option={option}
           />
         ))}
-        <TodoState remainTodo={remainTodo} />
+        <TodoState 
+          remainTodo={remainTodo}
+          option={option}
+          showOption={showOption}
+        />
       </div>
     </div>
   );

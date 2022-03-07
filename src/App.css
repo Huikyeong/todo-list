@@ -22,3 +22,16 @@
   margin-bottom: 6px;
   padding: 3px 10px;
 }
+
+.show-option {
+  /* border: 1px solid black; */
+  outline: none;
+  border: none;
+  background-color: transparent;
+  margin-left: 6px;
+}
+
+.show-option:hover {
+  outline: solid;
+  border: 1px black;
+}

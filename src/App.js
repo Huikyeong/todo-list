@@ -2,21 +2,9 @@ import React, { useState } from 'react'
 import logo from './logo.svg';
 import './App.css';
 
-function Todo({ todo, index, completeTodo, removeTodo, option, editTodo }) {
+function Todo({ todo, index, completeTodo, removeTodo, option, editTodo, selectTodo }) {
   const [isEditable, setIsEditable] = React.useState(todo.isEditable);
-  const [text, setText] = React.useState(todo.text);
-
-  const handleChange = e => {
-    setText(e.target.value);
-  };
-
-  const handleKeyDown = e => {
-    if (e.key === "Enter") {
-      setIsEditable(false);
-      editTodo(text, index);
-    }
-  };
-
+  
   const handleDoubleClick = () => {
     setIsEditable(true);
   }
@@ -28,26 +16,14 @@ function Todo({ todo, index, completeTodo, removeTodo, option, editTodo }) {
   }
 
   return (
-    <div>
-      {isEditable ? (
-        <input
-          className='input'
-          type="text"
-          value={text}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-        />
-      ) : (
-        <div className='todo' style={{ textDecoration: todo.isCompleted ? "line-through" : "" }}>
-          <div onDoubleClick={handleDoubleClick}>
-            {todo.text}
-          </div>
-          <div>
-            <button onClick={() => completeTodo(index)} style={{ width: "75px" }}>{todo.isCompleted ? 'Cancel' : 'Complete'}</button>
-            <button onClick={() => removeTodo(index)}>x</button>
-          </div>
-        </div>
-      )}
+    <div className='todo'>
+      <div className='todo-text' style={{ textDecoration: todo.isCompleted ? "line-through" : "" }} onClick={() => selectTodo(index)}>
+        {todo.text}
+      </div>
+      <div>
+        <button onClick={() => completeTodo(index)} style={{ width: "75px" }}>{todo.isCompleted ? 'Cancel' : 'Complete'}</button>
+        <button onClick={() => removeTodo(index)}>x</button>
+      </div>
     </div>
   );
 }
@@ -92,9 +68,9 @@ function TodoState({ remainTodo, option, showOption }) {
     e.target.style.outline = "solid";
   };
 
-  const handleHoverOut = (e, t) => {
+  const handleHoverOut = (e, btnNum) => {
     e.preventDefault();
-    if (t !== option) {
+    if (btnNum !== option) {
       e.target.style.border = "none";
       e.target.style.outline = "none";
     }
@@ -128,6 +104,30 @@ function TodoState({ remainTodo, option, showOption }) {
   );
 }
 
+function EditBox ({ todo, index, editTodo }) {
+  const [text, setText] = React.useState(todo.text);
+
+  const handleChange = e => {
+    setText(e.target.value);
+  };
+
+  const handleKeyDown = e => {
+    if (e.key === "Enter") {
+      editTodo(text, index);
+    }
+  };
+
+  return (
+    <input
+      className='input'
+      type="text"
+      value={text}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
+    />
+  );
+}
+
 function App() {
   const [todos, setTodos] = React.useState([
     { text: "first todo", isCompleted: false, isEditable: false },
@@ -136,6 +136,7 @@ function App() {
   ]);
 
   const [option, setOption] = React.useState(0);
+  const [select, setSelect] = React.useState(-1);
 
   const addTodo = text => {
     const newTodos = [...todos, { text, isCompleted: false, isEditable: false }];
@@ -170,21 +171,22 @@ function App() {
 
   const editTodo = (newText, index) => {
     todos[index].text = newText;
+    setTodos(todos);
+    setSelect(-1);
   };
 
-  // const handleKeyDown = (e, index) => {
-  //   if (e.key === "enter") {
-  //     todos[index].isEditable = false;
-  //     todos[index].text = e.target.value
-  //   }
-  // };
+  const handleClick = (e) => {
+    if (e.target.className !== "todo-text" && e.target.className !== "edit-box" && e.target.className !== "input") {
+      setSelect(-1);
+    }
+  };
 
-  // const handleDoubleClick = index => {
-  //   todos[index].isEditable = true;
-  // };
+  const selectTodo = index => {
+    setSelect(index);
+  };
 
   return (
-    <div className='app'>
+    <div className='app' onClick={handleClick}>
       <div className='todo-list'>
         <TodoForm addTodo={addTodo} />
         {todos.map((todo, index) => (
@@ -196,6 +198,7 @@ function App() {
             removeTodo={removeTodo}
             option={option}
             editTodo={editTodo}
+            selectTodo={selectTodo}
           />
         ))}
         <TodoState
@@ -203,6 +206,9 @@ function App() {
           option={option}
           showOption={showOption}
         />
+      </div>
+      <div className='edit-box'>
+        {select < 0 ? (<div></div>) : (<EditBox todo={todos[select]} index={select} editTodo={editTodo} />)}
       </div>
     </div>
   );

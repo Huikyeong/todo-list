@@ -2,12 +2,7 @@ import React, { useState } from 'react'
 import logo from './logo.svg';
 import './App.css';
 
-function Todo({ todo, index, completeTodo, removeTodo, option, editTodo, selectTodo }) {
-  const [isEditable, setIsEditable] = React.useState(todo.isEditable);
-  
-  const handleDoubleClick = () => {
-    setIsEditable(true);
-  }
+function Todo({ todo, index, completeTodo, removeTodo, option, selectTodo }) {
 
   if (option === 1 && todo.isCompleted) {
     return (<div></div>);
@@ -104,26 +99,15 @@ function TodoState({ remainTodo, option, showOption }) {
   );
 }
 
-function EditBox ({ todo, index, editTodo }) {
-  const [text, setText] = React.useState(todo.text);
-
-  const handleChange = e => {
-    setText(e.target.value);
-  };
-
-  const handleKeyDown = e => {
-    if (e.key === "Enter") {
-      editTodo(text, index);
-    }
-  };
+function EditBox ({ edit, index, handleChange, handleKeyDown }) {
 
   return (
     <input
       className='input'
       type="text"
-      value={text}
+      value={edit}
       onChange={handleChange}
-      onKeyDown={handleKeyDown}
+      onKeyDown={e => handleKeyDown(e, index)}
     />
   );
 }
@@ -137,6 +121,7 @@ function App() {
 
   const [option, setOption] = React.useState(0);
   const [select, setSelect] = React.useState(-1);
+  const [editText, setEditText] = React.useState("");
 
   const addTodo = text => {
     const newTodos = [...todos, { text, isCompleted: false, isEditable: false }];
@@ -169,24 +154,32 @@ function App() {
     setOption(newOption);
   };
 
-  const editTodo = (newText, index) => {
-    todos[index].text = newText;
-    setTodos(todos);
-    setSelect(-1);
-  };
-
   const handleClick = (e) => {
     if (e.target.className !== "todo-text" && e.target.className !== "edit-box" && e.target.className !== "input") {
       setSelect(-1);
+      setEditText("");
     }
   };
 
   const selectTodo = index => {
     setSelect(index);
+    setEditText(todos[index].text);
+  };
+
+  const handleChange = e => {
+    setEditText(e.target.value);
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Enter") {
+      todos[index].text = editText;
+      setTodos(todos);
+      setSelect(-1);
+    }
   };
 
   return (
-    <div className='app' onClick={handleClick}>
+    <div className='app' onMouseDown={handleClick}>
       <div className='todo-list'>
         <TodoForm addTodo={addTodo} />
         {todos.map((todo, index) => (
@@ -197,7 +190,6 @@ function App() {
             completeTodo={completeTodo}
             removeTodo={removeTodo}
             option={option}
-            editTodo={editTodo}
             selectTodo={selectTodo}
           />
         ))}
@@ -207,9 +199,20 @@ function App() {
           showOption={showOption}
         />
       </div>
-      <div className='edit-box'>
-        {select < 0 ? (<div></div>) : (<EditBox todo={todos[select]} index={select} editTodo={editTodo} />)}
-      </div>
+      {select < 0 ? (
+        <div></div>
+      ) : (
+        <div style={{marginTop: "3px", marginLeft: "20px"}}>
+          <EditBox 
+            edit={editText} 
+            index={select} 
+            handleChange={handleChange} 
+            handleKeyDown={handleKeyDown} />
+          <div style={{display: "flex", justifyContent: "flex-end", fontSize: "10px"}}>
+            edit here...
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import logo from './logo.svg';
 import './App.css';
 
@@ -46,7 +46,7 @@ function TodoForm({ addTodo }) {
   );
 }
 
-function TodoState({ remainTodo, option, showOption }) {
+function TodoState({ count, option, showOption, hover, handleHoverIn, handleHoverOut }) {
   const printNum = num => {
     if (num > 1) {
       return String(num) + " items left";
@@ -57,42 +57,31 @@ function TodoState({ remainTodo, option, showOption }) {
     }
   }
 
-  const handleHoverIn = e => {
-    e.preventDefault();
-    e.target.style.border = "1px black";
-    e.target.style.outline = "solid";
-  };
-
-  const handleHoverOut = (e, btnNum) => {
-    e.preventDefault();
-    if (btnNum !== option) {
-      e.target.style.border = "none";
-      e.target.style.outline = "none";
-    }
-  };
-
   return (
     <div>
-      { printNum( remainTodo() ) }
+      { printNum( count ) }
       <button
         className='show-option'
-        style={{ outline: option === 2 ? "solid" : "none", border: option === 2 ? "1px black" : "none" }}
-        onMouseOver={handleHoverIn}
-        onMouseOut={e => handleHoverOut(e, 2)}
+        id="2"
+        style={{ outline: option === 2 || hover === 2 ? "solid" : "none", border: option === 2 || hover === 2 ? "1px black" : "none" }}
+        onMouseOver={e => handleHoverIn(Number(e.target.id))}
+        onMouseOut={handleHoverOut}
         onClick={() => showOption(2)}
       >Completed</button>
       <button
         className='show-option'
-        style={{ outline: option === 1 ? "solid" : "none", border: option === 1 ? "1px black" : "none" }}
-        onMouseOver={handleHoverIn}
-        onMouseOut={e => handleHoverOut(e, 1)}
+        id="1"
+        style={{ outline: option === 1 || hover === 1 ? "solid" : "none", border: option === 1 || hover === 1 ? "1px black" : "none" }}
+        onMouseOver={e => handleHoverIn(Number(e.target.id))}
+        onMouseOut={handleHoverOut}
         onClick={() => showOption(1)}
       >Active</button>
       <button
         className='show-option'
-        style={{ outline: option === 0 ? "solid" : "none", border: option === 0 ? "1px black" : "none" }}
-        onMouseOver={handleHoverIn}
-        onMouseOut={e => handleHoverOut(e, 0)}
+        id="0"
+        style={{ outline: option === 0 || hover === 0 ? "solid" : "none", border: option === 0 || hover === 0 ? "1px black" : "none" }}
+        onMouseOver={e => handleHoverIn(Number(e.target.id))}
+        onMouseOut={handleHoverOut}
         onClick={() => showOption(0)}
       >All</button>
     </div>
@@ -119,36 +108,57 @@ function App() {
     { text: "third todo", isCompleted: false, isEditable: false }
   ]);
 
+  const [remain, setRemain] = React.useState(3);
   const [option, setOption] = React.useState(0);
   const [select, setSelect] = React.useState(-1);
   const [editText, setEditText] = React.useState("");
+  const [hover, setHover] = React.useState(-1);
 
   const addTodo = text => {
     const newTodos = [...todos, { text, isCompleted: false, isEditable: false }];
     setTodos(newTodos);
+    setRemain(remain + 1);
   };
 
   const completeTodo = index => {
     const newTodos = [...todos];
+    if (newTodos[index].isCompleted) {
+      setRemain(remain + 1);
+    }else{
+      setRemain(remain - 1);
+    }
     newTodos[index].isCompleted = !newTodos[index].isCompleted;
     setTodos(newTodos);
   };
 
   const removeTodo = index => {
     const newTodos = [...todos];
+    if (!newTodos[index].isCompleted) {
+      setRemain(remain - 1);
+    }
     newTodos.splice(index, 1);
     setTodos(newTodos);
   };
 
-  const remainTodo = () => {
-    var count = 0;
-    for (let i = 0; i < todos.length; i++) {
-      if (!todos[i].isCompleted) {
-        count++;
-      }
-    }
-    return count;
-  };
+  // const remainTodo = () => {
+  //   var count = 0;
+  //   for (let i = 0; i < todos.length; i++) {
+  //     if (!todos[i].isCompleted) {
+  //       count++;
+  //     }
+  //   }
+  //   return count;
+  // };
+
+  // const remainTodo = useMemo(() => {
+  //   var count = 0;
+  //   for (let i = 0; i < todos.length; i++) {
+  //     if (!todos[i].isCompleted) {
+  //       count++;
+  //     }
+  //   }
+  //   return count;
+  // }, [todos]);
 
   const showOption = newOption => {
     setOption(newOption);
@@ -178,6 +188,14 @@ function App() {
     }
   };
 
+  const handleHoverIn = index => {
+    setHover(index);
+  };
+  
+  const handleHoverOut = () => {
+    setHover(-1);
+  };
+
   return (
     <div className='app' onMouseDown={handleClick}>
       <div className='todo-list'>
@@ -194,9 +212,12 @@ function App() {
           />
         ))}
         <TodoState
-          remainTodo={remainTodo}
+          count={remain}
           option={option}
           showOption={showOption}
+          hover={hover}
+          handleHoverIn={handleHoverIn}
+          handleHoverOut={handleHoverOut}
         />
       </div>
       {select < 0 ? (

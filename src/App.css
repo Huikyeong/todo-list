@@ -49,8 +49,6 @@
   border: none;
   background-color: transparent;
   margin-left: 6px;
-  outline: {(option === index || hover === index) ? "solid" : "none"};
-  border: {(option === index || hover === index) ? "1px black" : "none"};
 }
 
 .input {

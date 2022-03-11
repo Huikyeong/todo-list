@@ -46,45 +46,19 @@ function TodoForm({ addTodo }) {
   );
 }
 
-function TodoState({ count, option, showOption, hover, handleHoverIn, handleHoverOut }) {
-  const printNum = num => {
-    if (num > 1) {
-      return String(num) + " items left";
-    } else if (num === 1) {
-      return String(num) + " item left";
-    } else {
-      return "no item";
-    }
-  }
+function OptionBtn({ text, index, option, showOption }) {
+  const isSelected = (option === index);
+  const [hover, setHover] = React.useState(false);
 
   return (
-    <div>
-      { printNum( count ) }
-      <button
-        className='show-option'
-        id="2"
-        style={{ outline: option === 2 || hover === 2 ? "solid" : "none", border: option === 2 || hover === 2 ? "1px black" : "none" }}
-        onMouseOver={e => handleHoverIn(Number(e.target.id))}
-        onMouseOut={handleHoverOut}
-        onClick={() => showOption(2)}
-      >Completed</button>
-      <button
-        className='show-option'
-        id="1"
-        style={{ outline: option === 1 || hover === 1 ? "solid" : "none", border: option === 1 || hover === 1 ? "1px black" : "none" }}
-        onMouseOver={e => handleHoverIn(Number(e.target.id))}
-        onMouseOut={handleHoverOut}
-        onClick={() => showOption(1)}
-      >Active</button>
-      <button
-        className='show-option'
-        id="0"
-        style={{ outline: option === 0 || hover === 0 ? "solid" : "none", border: option === 0 || hover === 0 ? "1px black" : "none" }}
-        onMouseOver={e => handleHoverIn(Number(e.target.id))}
-        onMouseOut={handleHoverOut}
-        onClick={() => showOption(0)}
-      >All</button>
-    </div>
+    <button
+      className='show-option'
+      style={{ outline: isSelected || hover ? "solid" : "none",
+               border: isSelected || hover ? "1px black" : "none" }}
+      onMouseOver={() => setHover(true)}
+      onMouseOut={() => setHover(false)}
+      onClick={() => showOption(index)}
+    >{text}</button>
   );
 }
 
@@ -112,7 +86,6 @@ function App() {
   const [option, setOption] = React.useState(0);
   const [select, setSelect] = React.useState(-1);
   const [editText, setEditText] = React.useState("");
-  const [hover, setHover] = React.useState(-1);
 
   const addTodo = text => {
     const newTodos = [...todos, { text, isCompleted: false, isEditable: false }];
@@ -139,26 +112,6 @@ function App() {
     newTodos.splice(index, 1);
     setTodos(newTodos);
   };
-
-  // const remainTodo = () => {
-  //   var count = 0;
-  //   for (let i = 0; i < todos.length; i++) {
-  //     if (!todos[i].isCompleted) {
-  //       count++;
-  //     }
-  //   }
-  //   return count;
-  // };
-
-  // const remainTodo = useMemo(() => {
-  //   var count = 0;
-  //   for (let i = 0; i < todos.length; i++) {
-  //     if (!todos[i].isCompleted) {
-  //       count++;
-  //     }
-  //   }
-  //   return count;
-  // }, [todos]);
 
   const showOption = newOption => {
     setOption(newOption);
@@ -188,13 +141,15 @@ function App() {
     }
   };
 
-  const handleHoverIn = index => {
-    setHover(index);
-  };
-  
-  const handleHoverOut = () => {
-    setHover(-1);
-  };
+  const printNum = num => {
+    if (num > 1) {
+      return String(num) + " items left";
+    } else if (num === 1) {
+      return String(num) + " item left";
+    } else {
+      return "no item";
+    }
+  }
 
   return (
     <div className='app' onMouseDown={handleClick}>
@@ -211,14 +166,27 @@ function App() {
             selectTodo={selectTodo}
           />
         ))}
-        <TodoState
-          count={remain}
-          option={option}
-          showOption={showOption}
-          hover={hover}
-          handleHoverIn={handleHoverIn}
-          handleHoverOut={handleHoverOut}
-        />
+        <div>
+          { printNum( remain ) }
+          <OptionBtn
+            text={"Completed"}
+            index={2}
+            option={option}
+            showOption={showOption}
+          />
+          <OptionBtn
+            text={"Active"}
+            index={1}
+            option={option}
+            showOption={showOption}
+          />
+          <OptionBtn
+            text={"All"}
+            index={0}
+            option={option}
+            showOption={showOption}
+          />
+        </div>
       </div>
       {select < 0 ? (
         <div></div>
